@@ -1,0 +1,147 @@
+body {
+    background: #f8f9fa;
+}
+
+.card {
+    border-radius: 12px;
+    border: none;
+    background: white;
+}
+
+.card h3 {
+    color: #333;
+}
+
+button {
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #0056b3;
+}
+
+.signup-button {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+}
+body {
+    font-family: Arial, sans-serif;
+}
+
+.nav-link {
+    transition: 0.3s;
+}
+
+.nav-link:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+}
+
+.card {
+    border-radius: 10px;
+}
+
+button {
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #0056b3;
+}
+
+/* Sidebar Navigation Styles */
+nav {
+    display: flex;
+    flex-direction: column; /* Stack sidebar items vertically */
+    height: 100vh; /* Full-height sidebar */
+    
+}
+
+nav a.nav-link {
+    padding: 10px;
+    text-decoration: none;
+    color: white;
+    transition: background 0.3s;
+}
+
+nav a.nav-link:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+}
+
+/* Logout Button */
+nav a.logout-btn {
+    margin-top: auto; /* Push Logout to the bottom */
+    color: #ff4d4d; /* Optional: Make Logout button red */
+    font-weight: bold;
+}
+
+/* Logout Button Styles */
+nav a.logout-btn {
+    margin-top: auto; /* Push Logout button to the bottom */
+    color: #ff4d4d; /* Red text color */
+    font-weight: bold; /* Make text bold */
+    text-align: center; /* Center the text */
+    padding: 10px; /* Add padding for better click area */
+    text-decoration: none; /* Remove underline */
+    border-radius: 5px; /* Optional: Rounded corners */
+    transition: background 0.3s; /* Add hover transition */
+}
+
+nav a.logout-btn:hover {
+    background: #ff4d4d; /* Red background on hover */
+    color: white; /* Change text to white on hover */
+}
+
+form {
+    max-width: 600px;
+    margin: auto;
+}
+
+button {
+    transition: background 0.3s;
+}
+
+button:hover {
+    background: #0056b3;
+}
+body {
+    font-family: Arial, sans-serif;
+    background: #f8f9fa; /* Light background for the main content */
+}
+
+.card {
+    border-radius: 10px;
+}
+
+.card-title {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+button {
+    transition: background 0.3s;
+}
+
+button:hover {
+    background: #0056b3;
+}
+
+/* Sidebar link styling */
+nav ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+nav .nav-item a {
+    padding: 10px;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    display: block;
+}
+
+nav .nav-item a:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
