@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        :root {
+            --primary: #212529;
+            --secondary: #f8f9fa;
+            --accent: #6c757d;
+            --light-gray: #e9ecef;
+            --sidebar-width: 250px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--secondary);
+            overflow-x: hidden;
+        }
+
+        .wrapper {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        #sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--primary);
+            color: white;
+            transition: all 0.3s;
+            position: fixed;
+            height: 100vh;
+            z-index: 999;
+        }
+
+        #sidebar.active {
+            margin-left: -var(--sidebar-width);
+        }
+
+        #sidebar .sidebar-header {
+            padding: 20px;
+            background-color: #000;
+            display: flex;
+            align-items: center;
+        }
+
+        #sidebar .sidebar-header img {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        #sidebar ul.components {
+            padding: 20px 0;
+            border-bottom: 1px solid #3a3a3a;
+        }
+
+        #sidebar ul p {
+            color: #fff;
+            padding: 10px;
+        }
+
+        #sidebar ul li a {
+            padding: 15px 20px;
+            font-size: 1.1em;
+            display: block;
+            color: #fff;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        #sidebar ul li a:hover {
+            background-color: #000;
+        }
+
+        #sidebar ul li.active > a {
+            background-color: #000;
+            border-left: 4px solid #fff;
+        }
+
+        #sidebar ul li a i {
+            margin-right: 10px;
+        }
+
+        #sidebar .sidebar-footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            padding: 20px;
+            background-color: #000;
+        }
+
+        /* Page Content */
+        #content {
+            width: calc(100% - var(--sidebar-width));
+            min-height: 100vh;
+            transition: all 0.3s;
+            position: absolute;
+            right: 0;
+        }
+
+        #content.active {
+            width: 100%;
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 15px 20px;
+        }
+
+        .navbar-btn {
+            box-shadow: none;
+            outline: none !important;
+            border: none;
+            background: transparent;
+        }
+
+        .navbar .user-profile {
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar .user-profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        /* Cards */
+        .dashboard-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: transform 0.3s;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .dashboard-card h5 {
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .dashboard-card .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            background-color: var(--light-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .dashboard-card .card-icon i {
+            font-size: 24px;
+            color: var(--primary);
+        }
+
+        /* Tables */
+        .table-responsive {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .table-custom {
+            margin-bottom: 0;
+        }
+
+        .table-custom thead th {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px;
+        }
+
+        .table-custom tbody td {
+            vertical-align: middle;
+            padding: 15px;
+        }
+
+        .table-custom tbody tr:nth-of-type(even) {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+
+        .attendance-badge {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .attendance-badge.high {
+            background-color: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .attendance-badge.medium {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .attendance-badge.low {
+            background-color: #f8d7da;
+            color: #842029;
+        }
+
+        /* Charts */
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            #sidebar {
+                margin-left: -var(--sidebar-width);
+            }
+            #sidebar.active {
+                margin-left: 0;
+            }
+            #content {
+                width: 100%;
+            }
+            #content.active {
+                width: calc(100% - var(--sidebar-width));
+                position: relative;
+                left: var(--sidebar-width);
+            }
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Profile Form */
+        .profile-form .form-control {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+
+        .profile-picture {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 20px;
+            border: 5px solid white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .present-status {
+            background-color: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .absent-status {
+            background-color: #f8d7da;
+            color: #842029;
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <!-- Sidebar -->
+    <nav id="sidebar">
+        <div class="sidebar-header">
+            <h5 class="mb-0">Facial Attendance</h5>
+        </div>
+
+        <ul class="list-unstyled components">
+            <li class="active">
+                <a href="#" data-tab="dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            </li>
+            <li>
+                <a href="#" data-tab="attendance"><i class="fas fa-calendar-check"></i> Attendance</a>
+            </li>
+            <li>
+                <a href="#" data-tab="classes"><i class="fas fa-chalkboard-teacher"></i> Classes</a>
+            </li>
+            <li>
+                <a href="#" data-tab="reports"><i class="fas fa-chart-bar"></i> Reports</a>
+            </li>
+            <li>
+                <a href="#" data-tab="profile"><i class="fas fa-user"></i> Profile</a>
+            </li>
+            <li>
+                <a href="#" data-tab="settings"><i class="fas fa-cog"></i> Settings</a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <a href="login.html" class="btn btn-outline-light btn-sm w-100">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div id="content">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid">
+                <button type="button" id="sidebarCollapse" class="btn navbar-btn">
+                    <i class="fas fa-bars"></i>
+                </button>
+
+                <div class="ms-auto user-profile">
+                    <img src="/api/placeholder/40/40" alt="User Profile">
+                    <div>
+                        <h6 class="mb-0">John Smith</h6>
+                        <small class="text-muted">Mathematics Teacher</small>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Dashboard Content -->
+        <div class="container-fluid py-4">
+            <!-- Dashboard Tab -->
+            <div id="dashboard" class="tab-content active">
+                <div class="row">
+                    <div class="col-md-12 mb-4">
+                        <h4>Dashboard</h4>
+                        <p class="text-muted">Welcome back, John! Here's an overview of your attendance data.</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="dashboard-card">
+                            <div class="card-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h5>Total Students</h5>
+                            <h3>120</h3>
+                            <p class="text-muted">Across all classes</p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="dashboard-card">
+                            <div class="card-icon">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                            <h5>Today's Attendance</h5>
+                            <h3>93%</h3>
+                            <p class="text-muted">16 March, 2025</p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="dashboard-card">
+                            <div class="card-icon">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <h5>Weekly Average</h5>
+                            <h3>88%</h3>
+                            <p class="text-muted">Last 7 days</p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="dashboard-card">
+                            <div class="card-icon">
+                                <i class="fas fa-chalkboard"></i>
+                            </div>
+                            <h5>Classes Today</h5>
+                            <h3>4</h3>
+                            <p class="text-muted">2 remaining</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-md-8">
+                        <div class="dashboard-card">
+                            <h5>Monthly Attendance Overview</h5>
+                            <div class="chart-container">
+                                <canvas id="attendanceChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="dashboard-card">
+                            <h5>Upcoming Classes</h5>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">Algebra II</h6>
+                                        <small class="text-muted">10:30 AM - Room 302</small>
+                                    </div>
+                                    <span class="badge bg-primary rounded-pill">Next</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">Calculus</h6>
+                                        <small class="text-muted">1:15 PM - Room 305</small>
+                                    </div>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">Math Lab</h6>
+                                        <small class="text-muted">Tomorrow, 9:00 AM - Room 310</small>
+                                    </div>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">Geometry</h6>
+                                        <small class="text-muted">Tomorrow, 2:30 PM - Room 301</small>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <div class="dashboard-card">
+                            <h5>Recent Attendance Records</h5>
+                            <div class="table-responsive">
+                                <table class="table table-custom">
+                                    <thead>
+                                    <tr>
+                                        <th>Class</th>
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th>Present</th>
+                                        <th>Absent</th>
+                                        <th>Attendance Rate</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>Calculus</td>
+                                        <td>16 Mar, 2025</td>
+                                        <td>8:30 AM</td>
+                                        <td>28</td>
+                                        <td>2</td>
+                                        <td><span class="attendance-badge high">93.3%</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Algebra II</td>
+                                        <td>16 Mar, 2025</td>
+                                        <td>10:30 AM</td>
+                                        <td>23</td>
+                                        <td>2</td>
+                                        <td><span class="attendance-badge high">92.0%</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Geometry</td>
+                                        <td>15 Mar, 2025</td>
+                                        <td>2:30 PM</td>
+                                        <td>25</td>
+                                        <td>5</td>
+                                        <td><span class="attendance-badge medium">83.3%</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Math Lab</td>
+                                        <td>15 Mar, 2025</td>
+                                        <td>9:00 AM</td>
+                                        <td>18</td>
+                                        <td>7</td>
+                                        <td><span class="attendance-badge medium">72.0%</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Algebra II</td>
+                                        <td>14 Mar, 2025</td>
+                                        <td>10:30 AM</td>
+                                        <td>21</td>
+                                        <td>4</td>
+                                        <td><span class="attendance-badge high">84.0%</span></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Attendance Tab -->
+            <div id="attendance" class="tab-content">
+                <div class="row">
+                    <div class="col-md-12 mb-4">
+                        <h4>Attendance Management</h4>
+                        <p class="text-muted">View and manage attendance records for all your classes.</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="dashboard-card">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h5 class="mb-0">Class Attendance</h5>
+                                <div>
+                                    <select class="form-select form-select-sm d-inline-block w-auto me-2">
+                                        <option selected>All Classes</option>
+                                        <option>Algebra II</option>
+                                        <option>Calculus</option>
+                                        <option>Geometry</option>
+                                        <option>Math Lab</option>
+                                    </select>
+                                    <input type="date" class="form-control form-control-sm d-inline-block w-auto" value="2025-03-16">
+                                </div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-custom">
+                                    <thead>
+                                    <tr>
+                                        <th>Student ID</th>
+                                        <th>Student Name</th>
+                                        <th>Class</th>
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>ST12345</td>
+                                        <td>Alice Johnson</td>
+                                        <td>Calculus</td>
+                                        <td>16 Mar, 2025</td>
+                                        <td>8:32 AM</td>
+                                        <td><span class="badge present-status">Present</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>ST12346</td>
+                                        <td>Bob Smith</td>
+                                        <td>Calculus</td>
+                                        <td>16 Mar, 2025</td>
+                                        <td>8:29 AM</td>
+                                        <td><span class="badge present-status">Present</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>ST12347</td>
+                                        <td>Charlie Davis</td>
+                                        <td>Calculus</td>
+                                        <td>16 Mar, 2025</td>
+                                        <td>-</td>
+                                        <td><span class="badge absent-status">Absent</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>ST12348</td>
+                                        <td>Diana Wilson</td>
+                                        <td>Calculus</td>
+                                        <td>16 Mar, 2025</td>
+                                        <td>8:35 AM</td>
+                                        <td><span class="badge present-status">Present</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>ST12349</td>
+                                        <td>Edward Brown</td>
+                                        <td>Calculus</td>
+                                        <td>16 Mar, 2025</td>
+                                        <td>8:33 AM</td>
+                                        <td><span class="badge present-status">Present</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <nav aria-label="Page navigation" class="mt-4">
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item disabled">
+                                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                                    </li>
+                                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="#">Next</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Classes Tab -->
+            <div id="classes" class="tab-content">
+                <div class="row">
+                    <div class="col-md-12 mb-4">
+                        <h4>Class Management</h4>
+                        <p class="text-muted">View and manage your classes and sections.</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="dashboard-card">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h5 class="mb-0">Your Classes</h5>
+                                <button class="btn btn-sm btn-primary">
+                                    <i class="fas fa-plus"></i> Add Class</button>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-custom">
+                                    <thead>
+                                    <tr>
+                                        <th>Class Name</th>
+                                        <th>Schedule</th>
+                                        <th>Room</th>
+                                        <th>Students</th>
+                                        <th>Average Attendance</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>Algebra II</td>
+                                        <td>MWF, 10:30 AM</td>
+                                        <td>Room 302</td>
+                                        <td>25</td>
+                                        <td><span class="attendance-badge high">88%</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-eye"></i></button>
+                                            <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Calculus</td>
+                                        <td>MWF, 8:30 AM</td>
+                                        <td>Room 305</td>
+                                        <td>30</td>
+                                        <td><span class="attendance-badge high">92%</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-eye"></i></button>
+                                            <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Geometry</td>
+                                        <td>TTh, 2:30 PM</td>
+                                        <td>Room 301</td>
+                                        <td>30</td>
+                                        <td><span class="attendance-badge medium">83%</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-eye"></i></button>
+                                            <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Math Lab</td>
+                                        <td>TTh, 9:00 AM</td>
+                                        <td>Room 310</td>
+                                        <td>25</td>
+                                        <td><span class="attendance-badge medium">75%</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-eye"></i></button>
+                                            <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="dashboard-card">
+                            <h5>Class Details</h5>
+                            <p class="text-muted mb-4">Select a class to view details</p>
+
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="card-icon me-3">
+                                    <i class="fas fa-book"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">Calculus</h6>
+                                    <small class="text-muted">Advanced Mathematics</small>
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between px-0">
+                                    <span>Schedule:</span>
+                                    <span class="text-muted">MWF, 8:30 AM</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between px-0">
+                                    <span>Room:</span>
+                                    <span class="text-muted">Room 305</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between px-0">
+                                    <span>Students:</span>
+                                    <span class="text-muted">30</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between px-0">
+                                    <span>Average Attendance:</span>
+                                    <span class="text-muted">92%</span>
+                                </li>
+                            </ul>
+
+                            <div class="mt-4">
+                                <button class="btn btn-primary btn-sm w-100">View Class</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports Tab -->
+            <div id="reports" class="tab-content">
+                <div class="row">
+                    <div class="col-md-12 mb-4">
+                        <h4>Attendance Reports</h4>
+                        <p class="text-muted">Generate and view attendance reports for your classes.</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="dashboard-card">
+                            <h5>Generate Report</h5>
+                            <form class="mt-3">
+                                <div class="mb-3">
+                                    <label class="form-label">Report Type</label>
+                                    <select class="form-select">
+                                        <option>Daily Attendance</option>
+                                        <option>Weekly Summary</option>
+                                        <option>Monthly Overview</option>
+                                        <option>Student-Specific</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Class</label>
+                                    <select class="form-select">
+                                        <option>All Classes</option>
+                                        <option>Algebra II</option>
+                                        <option>Calculus</option>
+                                        <option>Geometry</option>
+                                        <option>Math Lab</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Date Range</label>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <input type="date" class="form-control" value="2025-03-01">
+                                        </div>
+                                        <div class="col-6">
+                                            <input type="date" class="form-control" value="2025-03-16">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Format</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="reportFormat" id="formatPDF" checked>
+                                        <label class="form-check-label" for="formatPDF">
+                                            PDF
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="reportFormat" id="formatExcel">
+                                        <label class="form-check-label" for="formatExcel">
+                                            Excel
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary w-100">Generate Report</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="col-md-8">
+                        <div class="dashboard-card">
+                            <h5>Recent Reports</h5>
+                            <div class="table-responsive">
+                                <table class="table table-custom">
+                                    <thead>
+                                    <tr>
+                                        <th>Report Name</th>
+                                        <th>Type</th>
+                                        <th>Date Generated</th>
+                                        <th>Format</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>Calculus_March_2025</td>
+                                        <td>Monthly Overview</td>
+                                        <td>16 Mar, 2025</td>
+                                        <td>PDF</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary"><i class="fas fa-download"></i></button>
+                                            <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-eye"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Algebra_II_Week10</td>
+                                        <td>Weekly Summary</td>
+                                        <td>12 Mar, 2025</td>
+                                        <td>Excel</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary"><i class="fas fa-download"></i></button>
+                                            <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-eye"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Geometry_Feb_2025</td>
+                                        <td>Monthly Overview</td>
+                                        <td>28 Feb, 2025</td>
+                                        <td>PDF</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary"><i class="fas fa-download"></i></button>
+                                            <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-eye"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Math_Lab_Week9</td>
+                                        <td>Weekly Summary</td>
+                                        <td>05 Mar, 2025</td>
+                                        <td>Excel</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary"><i class="fas fa-download"></i></button>
+                                            <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-eye"></i></button>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-card mt-4">
+                            <h5>Attendance Trends</h5>
+                            <div class="chart-container">
+                                <canvas id="trendsChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Tab -->
+            <div id="profile" class="tab-content">
+                <div class="row">
+                    <div class="col-md-12 mb-4">
+                        <h4>Your Profile</h4>
+                        <p class="text-muted">View and update your profile information.</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="dashboard-card text-center">
+                            <img src="/api/placeholder/150/150" alt="Profile Picture" class="profile-picture">
+                            <h5>John Smith</h5>
+                            <p class="text-muted">Mathematics Teacher</p>
+                            <hr>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between px-0">
+                                    <span>ID:</span>
+                                    <span class="text-muted">T12345</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between px-0">
+                                    <span>Department:</span>
+                                    <span class="text-muted">Mathematics</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between px-0">
+                                    <span>Email:</span>
+                                    <span class="text-muted">john.smith@school.edu</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between px-0">
+                                    <span>Phone:</span>
+                                    <span class="text-muted">(555) 123-4567</span>
+                                </li>
+                            </ul>
+                            <button class="btn btn-primary btn-sm w-100 mt-3">Update Photo</button>
+                        </div>
+                    </div>
+
+                    <div class="col-md-8">
+                        <div class="dashboard-card">
+                            <h5>Edit Profile</h5>
+                            <form class="profile-form mt-4">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">First Name</label>
+                                            <input type="text" class="form-control" value="John">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Last Name</label>
+                                            <input type="text" class="form-control" value="Smith">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Email</label>
+                                            <input type="email" class="form-control" value="john.smith@school.edu">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Phone</label>
+                                            <input type="tel" class="form-control" value="(555) 123-4567">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Department</label>
+                                    <input type="text" class="form-control" value="Mathematics" readonly>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Address</label>
+                                    <textarea class="form-control" rows="3">123 Education St, Teacherville, TS 12345</textarea>
+                                </div>
+                                <div class="text-end">
+                                    <button class="btn btn-dark">Save Changes</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const sidebar = document.getElementById('sidebar');
+    const sidebarCollapse = document.getElementById('sidebarCollapse');
+    const tabLinks = document.querySelectorAll('[data-tab]');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    sidebarCollapse.addEventListener('click', () => {
+        sidebar.classList.toggle('active');
+        document.getElementById('content').classList.toggle('active');
+    });
+
+    tabLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            const targetTab = link.getAttribute('data-tab');
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(targetTab).classList.add('active');
+            tabLinks.forEach(tab => tab.parentElement.classList.remove('active'));
+            link.parentElement.classList.add('active');
+        });
+    });
+
+    const attendanceChart = new Chart(document.getElementById('attendanceChart'), {
+        type: 'line',
+        data: {
+            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+            datasets: [{
+                label: 'Attendance Rate',
+                data: [95, 88, 92, 85],
+                backgroundColor: 'rgba(33, 37, 41, 0.2)',
+                borderColor: '#212529',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+
+    const trendsChart = new Chart(document.getElementById('trendsChart'), {
+        type: 'bar',
+        data: {
+            labels: ['January', 'February', 'March', 'April'],
+            datasets: [{
+                label: 'Average Attendance',
+                data: [87, 90, 85, 88],
+                backgroundColor: '#6c757d'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .card-header {
+            background-color: #343a40;
+            color: #fff;
+        }
+        .table th, .table td {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">Attendance System</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="admin_dashboard.html">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="admin_login.html">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Attendance Statistics Section -->
+    <div class="container mt-5">
+        <div class="row">
+            <!-- Total Students Attended -->
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Total Students Attended</h5>
+                    </div>
+                    <div class="card-body">
+                        <h3 id="total-attended">150</h3>
+                    </div>
+                </div>
+            </div>
+            <!-- Total Sessions -->
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Total Sessions</h5>
+                    </div>
+                    <div class="card-body">
+                        <h3 id="total-sessions">20</h3>
+                    </div>
+                </div>
+            </div>
+            <!-- Attendance Percentage -->
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Attendance Percentage</h5>
+                    </div>
+                    <div class="card-body">
+                        <h3 id="attendance-percentage">75%</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attendance Records Table -->
+        <div class="card mt-5">
+            <div class="card-header">
+                <h5>Attendance Records</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Student Name</th>
+                            <th>Matric Number</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Facial Recognition</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendance-records">
+                        <!-- Attendance data will be dynamically inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        // Sample Data (Replace with dynamic data from the backend or database)
+        const records = [
+            {name: 'John Doe', matric: '12345', date: '2025-03-15', status: 'Present', facialRecognition: 'Matched'},
+            {name: 'Jane Smith', matric: '67890', date: '2025-03-15', status: 'Absent', facialRecognition: 'Not Matched'},
+            {name: 'Samuel Green', matric: '11223', date: '2025-03-15', status: 'Present', facialRecognition: 'Matched'},
+            // Add more records as needed
+        ];
+
+        // Insert records into the table
+        const recordsTable = document.getElementById('attendance-records');
+        records.forEach((record, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${record.name}</td>
+                <td>${record.matric}</td>
+                <td>${record.date}</td>
+                <td>${record.status}</td>
+                <td>${record.facialRecognition}</td>
+            `;
+            recordsTable.appendChild(row);
+        });
+    </script>
+</body>
+</html>
